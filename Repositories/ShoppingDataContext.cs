@@ -19,16 +19,16 @@ namespace ShopEaseApp.Models
             public DbSet<OrderDetail> OrderDetails { get; set; }
             public DbSet<Payment> Payments { get; set; }
 
-    //        protected override void OnModelCreating(ModelBuilder modelBuilder)
-    //        {
-    //            modelBuilder
-    //.Entity<OrderDetail>(builder =>
-    //{
-    //    builder.HasNoKey();
-    //    builder.ToTable("OrderDetails");
-    //});
-    //        }
-
+            //        protected override void OnModelCreating(ModelBuilder modelBuilder)
+            //        {
+            //            modelBuilder
+            //.Entity<OrderDetail>(builder =>
+            //{
+            //    builder.HasNoKey();
+            //    builder.ToTable("OrderDetails");
+            //});
+            //        }
+           
         }
     }
 }
