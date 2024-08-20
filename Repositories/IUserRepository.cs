@@ -10,11 +10,17 @@ namespace ShopEaseApp.Repositories
     {
         Task<User> GetUserByIdAsync(int userId);
         Task<bool> RegisterUserAsync(User user); // Register a new user
-        Task<User> LoginAsync(string username, string password); // Login a user
+        bool LoginAsync(string username, string password); // Login a user
         Task<bool> UpdateUserAsync(User user);
     }
 
     // Interface for seller operations
+
+
+
+
+
+
     public interface ISellerRepository : IUserRepository
     {
         Task<bool> AddProductAsync(Product product);
@@ -27,7 +33,7 @@ namespace ShopEaseApp.Repositories
         Task<bool> ConfirmPaymentAsync(int paymentId);
     }
 
-    // Interface for buyer
+    //    // Interface for buyer
     public interface IBuyerRepository : IUserRepository
     {
         Task<IEnumerable<Product>> SearchProductsAsync(string searchTerm);
@@ -39,7 +45,7 @@ namespace ShopEaseApp.Repositories
         Task<IEnumerable<OrderDetail>> GetOrderDetailsForOrderAsync(int orderId);
     }
 
-    // Implementation of the seller repository
+    //    // Implementation of the seller repository
     public class SellerRepository : ISellerRepository
     {
         private readonly ShoppingDataContext.ShoppingModelDB _context;
@@ -54,7 +60,7 @@ namespace ShopEaseApp.Repositories
             return await _context.User.FindAsync(userId);
         }
 
-       
+
 
         public async Task<bool> UpdateUserAsync(User user)
         {
@@ -132,9 +138,21 @@ namespace ShopEaseApp.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<User> LoginAsync(string username, string password)
+        public bool LoginAsync(string username, string password)
         {
-            return await _context.User.FirstOrDefaultAsync(u => u.UserName == username && u.Password == password);
+           bool status = false;
+            User user = _context.User.Where(x => x.UserName == username).FirstOrDefault();
+            if (user != null)
+           {
+                if (user.Password == password)
+                {
+                    status = true;
+                }
+
+
+           }
+
+         return status;
         }
     }
 
@@ -228,15 +246,33 @@ namespace ShopEaseApp.Repositories
                 .Where(od => od.Order.OrderID == orderId)
                 .ToListAsync();
         }
-        public async Task<bool> RegisterUserAsync(User user)
+        public async Task<bool> RegisterUserAsync(User userregistration)
         {
-            await _context.User.AddAsync(user);
+            await _context.User.AddAsync(userregistration);
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<User> LoginAsync(string username, string password)
+
+
+        public bool LoginAsync(string username, string password)
         {
-            return await _context.User.FirstOrDefaultAsync(u => u.UserName == username && u.Password == password);
+
+            bool status = false;
+            User user = _context.User.Where(x => x.UserName == username).FirstOrDefault();
+            if (user != null)
+            {
+                if (user.Password == password)
+                {
+                    status = true;
+                }
+
+
+            }
+
+            return status;
+
         }
     }
+
+
 }
