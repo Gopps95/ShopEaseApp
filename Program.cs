@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using static ShopEaseApp.Models.ShoppingDataContext;
+using ShopEaseApp.Models;
+using static ShopEaseApp.Models.ShoppingModelDB;
 
 var builder = WebApplication.CreateBuilder(args);
 
