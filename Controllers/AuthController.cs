@@ -1,8 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using ShopEaseApp.Models;
-
-
+using ShopEaseApp.Repositories;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Security.Claims;
 
 namespace ShopEaseApp.Controllers
 {
@@ -10,26 +15,67 @@ namespace ShopEaseApp.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthService _authService;
+       // private readonly IAuthService _authService;
+        private readonly IUserRepository _userrepo;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IUserRepository userrepo)
         {
-            _authService = authService;
+            //_authService = authService;
+            _userrepo = userrepo;
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            var token = await _authService.LoginAsync(model);
-            if (token == null)
-                return Unauthorized();
-            return Ok(new { Token = token });
+            bool isValiduser = _userrepo.LoginAsync(model.Username, model.Password);
+            if (isValiduser)
+            {
+                
+
+                var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ConfigurationManager.AppSetting["JWT:Secret"]));
+                var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+                var tokeOptions = new JwtSecurityToken(
+                    issuer: ConfigurationManager.AppSetting["JWT:ValidIssuer"],
+                    audience: ConfigurationManager.AppSetting["JWT:ValidAudience"],
+                    claims: new List<Claim>(),
+                    expires: DateTime.Now.AddMinutes(6),
+                    signingCredentials: signinCredentials
+                );
+
+                var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
+
+                ///create a cookie to store the token
+                CookieOptions options = new CookieOptions
+                {
+                    Domain = "localhost", // Set the domain for the cookie
+                    Expires = DateTime.Now.AddMinutes(6), // Set expiration date to 7 days from now
+                    Path = "/", // Cookie is available within the entire application
+                    Secure = true, // Ensure the cookie is only sent over HTTPS
+                    HttpOnly = true, // Prevent client-side scripts from accessing the cookie
+                  //  MaxAge = TimeSpan.FromMinutes(6), // Another way to set the expiration time
+                    IsEssential = true // Indicates the cookie is essential for the application to function
+                };
+                //Response.Cookies.Append("UserId", "1234567", options);
+                Response.Cookies.Append(model.Username, tokenString, options);
+
+
+              HttpContext.Session.SetString("JWTToken", model.Username);
+
+                  return Ok(new JWTTokenResponse { Token = tokenString });
+                
+
+            }
+            return Unauthorized();
         }
 
+        [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegistrationModel model)
+        public async Task<IActionResult> Register([FromBody] User model)
         {
-            var result = await _authService.RegisterAsync(model);
+
+
+var result= await _userrepo.RegisterUserAsync(model);
             if (result)
                 return Ok(new { Message = "User registered successfully" });
             return BadRequest(new { Message = "User registration failed" });

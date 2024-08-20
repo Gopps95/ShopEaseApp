@@ -19,6 +19,7 @@ namespace ShopEaseApp.Models
             public DbSet<OrderDetail> OrderDetails { get; set; }
             public DbSet<Payment> Payments { get; set; }
 
+          //  public DbSet<RegistrationModel> Register { get; set; }
             //        protected override void OnModelCreating(ModelBuilder modelBuilder)
             //        {
             //            modelBuilder
@@ -28,7 +29,7 @@ namespace ShopEaseApp.Models
             //    builder.ToTable("OrderDetails");
             //});
             //        }
-           
+
         }
     }
 }

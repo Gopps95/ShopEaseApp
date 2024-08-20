@@ -8,6 +8,7 @@ using ShopEaseApp.Models;
 using ShopEaseApp.Helpers;
 using Microsoft.OpenApi.Models;
 using static ShopEaseApp.Models.ShoppingDataContext;
+using ShopEaseApp.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,12 +16,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ShoppingModelDB>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ShoppingCnString")));
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<ShoppingModelDB>()
-    .AddDefaultTokenProviders();
+//builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+//    .AddEntityFrameworkStores<ShoppingModelDB>()
+//    .AddDefaultTokenProviders();
 
-builder.Services.AddTransient<IAuthService, AuthService>();
+//builder.Services.AddTransient<IAuthService, AuthService>();
 
+builder.Services.AddTransient<IUserRepository, BuyerRepository>();
+//builder.Services.AddTransient<IUserRepository, SellerRepository>();
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(6); // Set session timeout
+});
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -51,6 +60,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -61,7 +71,21 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseSession();
+app.Use(async (context, next) =>
+{
+    var JWToken = context.Session.GetString("JWTToken");
+    if (!string.IsNullOrEmpty(JWToken))
+    {
+        context.Request.Headers.Add("Authorization", "Bearer " + JWToken);
+    }
+    await next();
+});
+
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 app.Run();

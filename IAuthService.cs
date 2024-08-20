@@ -7,76 +7,95 @@ using System.Text;
 using  ShopEaseApp.Models;
 using ShopEaseApp.Helpers;
 using Microsoft.Extensions.Options;
+using ShopEaseApp.Repositories;
+using ShopEaseApp.Controllers;
 
 namespace ShopEaseApp
 {
     public interface IAuthService
     {
-        Task<bool> RegisterAsync(RegistrationModel model);
+        Task<bool> RegisterAsync(User model);
         Task<string> LoginAsync(LoginModel model);
     }
-    public class AuthService : IAuthService
-    {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly JwtSettings _jwtSettings;
-        public AuthService(UserManager<ApplicationUser> userManager, IOptions<JwtSettings> jwtSettings)
-        {
-            _userManager = userManager;
-            _jwtSettings = jwtSettings.Value;
-        }
+   // public class AuthService : IAuthService
+    //{
+        //private readonly UserManager<ApplicationUser> _userManager;
+        //private readonly JwtSettings _jwtSettings;
+      //  private readonly IUserRepository _userrepo;
 
-        public async Task<string> LoginAsync(LoginModel model)
-        {
-            var user = await _userManager.FindByNameAsync(model.Username);
-            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
-            {
-                var userRoles = await _userManager.GetRolesAsync(user);
-                var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                };
+        //public AuthService(UserManager<ApplicationUser> userManager, IOptions<JwtSettings> jwtSettings,IUserRepository userrepo)
+        //{
+        //    _userManager = userManager;
+        //    _jwtSettings = jwtSettings.Value;
+        //    _userrepo = userrepo;
+        //}
 
-                foreach (var userRole in userRoles)
-                {
-                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-                }
+        //public AuthService(IOptions<JwtSettings> jwtSettings, IUserRepository userrepo)
+        //{
+        //    _jwtSettings = jwtSettings.Value;
+        //        _userrepo = userrepo;
 
-                var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret));
+        //}
 
-                var token = new JwtSecurityToken(
-                    issuer: _jwtSettings.Issuer,
-                    audience: _jwtSettings.Audience,
-                    expires: DateTime.Now.AddMinutes(_jwtSettings.ExpirationInMinutes),
-                    claims: authClaims,
-                    signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                );
+        //public async Task<string> LoginAsync(LoginModel model)
+        //{
+        // //   var user = await _userManager.FindByNameAsync(model.Username);
+        //   // if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+        //   bool isValiduser= _userrepo.LoginAsync(model.Username, model.Password);
+        //    if (isValiduser)
+        //     {
+        //        //var userRoles = await _userManager.GetRolesAsync(user);
+        //        //var authClaims = new List<Claim>
+        //        //{
 
-                return new JwtSecurityTokenHandler().WriteToken(token);
-            }
-            return null;
-        }
+        //        //    new Claim(user.),
+        //        //    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        //        //};
 
-        public async Task<bool> RegisterAsync(RegistrationModel model)
-        {
-            var userExists = await _userManager.FindByNameAsync(model.Username);
-            if (userExists != null)
-                return false;
+        //        //foreach (var userRole in userRoles)
+        //        //{
+        //        //    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+        //        //}
 
-            ApplicationUser user = new ApplicationUser()
-            {
-                Email = model.Email,
-                SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = model.Username,
-                //FullName = model.FullName
-            };
+        //        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ConfigurationManager.AppSetting["JWT:Secret"]));
+        //        var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+        //        var tokeOptions = new JwtSecurityToken(
+        //            issuer: ConfigurationManager.AppSetting["JWT:ValidIssuer"],
+        //            audience: ConfigurationManager.AppSetting["JWT:ValidAudience"],
+        //            claims: new List<Claim>(),
+        //            expires: DateTime.Now.AddMinutes(6),
+        //            signingCredentials: signinCredentials
+        //        );
 
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (!result.Succeeded)
-                return false;
+        //        var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
+        //        return Ok(new JWTTokenResponse { Token = tokenString });
 
-            await _userManager.AddToRoleAsync(user, model.Role);
-            return true;
-        }
-    }
+        //    }
+        //    return Unauthorized();
+        //}
+
+//        public async Task<bool> RegisterAsync(User model)
+//        {
+//           //var userExists = await _userManager.FindByNameAsync(model.UserName);
+//           // if (userExists != null)
+//           //     return false;
+
+//            //ApplicationUser user = new ApplicationUser()
+//            //{
+//            //    Email = model.EmailID,
+//            //    SecurityStamp = Guid.NewGuid().ToString(),
+//            //    UserName = model.UserName
+//            //    //FullName = model.FullName
+//            //};
+
+//            var result=await _userrepo.RegisterUserAsync(model);
+//            return result;
+////            var result = await _userManager.CreateAsync(user, model.Password);
+//            //if (!result.Succeeded)
+//            //    return false;
+
+//          //  await _userManager.AddToRoleAsync(user, model.Role);
+//          //  return true;
+//        }
+//    }
 }
