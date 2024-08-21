@@ -8,7 +8,9 @@ namespace ShopEaseApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
- 
+   // [Authorize(Roles="Buyer")]
+    //[Authorize(Roles = "Seller")]
+
     public class ProductController : ControllerBase
     {
         // GET: api/<ProductController>

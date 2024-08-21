@@ -57,7 +57,11 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
     };
 });
-
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("BuyerOnly", policy => policy.RequireRole("Buyer"));
+    options.AddPolicy("SellerOnly", policy => policy.RequireRole("Seller"));
+});
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 

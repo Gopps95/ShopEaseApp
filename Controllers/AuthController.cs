@@ -38,7 +38,11 @@ namespace ShopEaseApp.Controllers
                 var tokeOptions = new JwtSecurityToken(
                     issuer: ConfigurationManager.AppSetting["JWT:ValidIssuer"],
                     audience: ConfigurationManager.AppSetting["JWT:ValidAudience"],
-                    claims: new List<Claim>(),
+                    claims: new List<Claim>(new Claim[]
+                    {
+                        new Claim(ClaimTypes.Name,model.Username),
+                        new Claim(ClaimTypes.Role,model.Role)
+                    }),
                     expires: DateTime.Now.AddMinutes(6),
                     signingCredentials: signinCredentials
                 );

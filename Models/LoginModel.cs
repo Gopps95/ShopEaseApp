@@ -9,5 +9,7 @@ namespace ShopEaseApp.Models
 
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
+
+        public string? Role { get; set; }
     }
 }
