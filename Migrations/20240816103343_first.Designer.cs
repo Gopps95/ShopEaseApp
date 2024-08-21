@@ -11,7 +11,7 @@ using ShopEaseApp.Models;
 
 namespace ShopEaseApp.Migrations
 {
-    [DbContext(typeof(ShoppingDataContext.ShoppingModelDB))]
+    [DbContext(typeof(ShoppingDataContext))]
     [Migration("20240816103343_first")]
     partial class first
     {

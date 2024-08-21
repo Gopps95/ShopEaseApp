@@ -10,7 +10,7 @@ using ShopEaseApp.Models;
 
 namespace ShopEaseApp.Migrations
 {
-    [DbContext(typeof(ShoppingDataContext.ShoppingModelDB))]
+    [DbContext(typeof(ShoppingDataContext))]
     [Migration("20240816121333_new")]
     partial class @new
     {

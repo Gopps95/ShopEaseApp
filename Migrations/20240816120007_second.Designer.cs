@@ -10,7 +10,7 @@ using ShopEaseApp.Models;
 
 namespace ShopEaseApp.Migrations
 {
-    [DbContext(typeof(ShoppingDataContext.ShoppingModelDB))]
+    [DbContext(typeof(ShoppingDataContext))]
     [Migration("20240816120007_second")]
     partial class second
     {

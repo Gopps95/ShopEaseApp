@@ -9,7 +9,7 @@ using ShopEaseApp.Models;
 
 namespace ShopEaseApp.Migrations
 {
-    [DbContext(typeof(ShoppingDataContext.ShoppingModelDB))]
+    [DbContext(typeof(ShoppingDataContext))]
     partial class ShoppingModelDBModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

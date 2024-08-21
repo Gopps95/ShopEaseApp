@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using ShopEaseApp.Areas.Buyer.Models;
+using ShopEaseApp.Models;
 using static ShopEaseApp.Models.ShoppingDataContext;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,9 +12,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<ShoppingModelDB>
+builder.Services.AddDbContext<ShoppingModel>
            (options => options.UseSqlServer(builder.Configuration.GetConnectionString("ShoppingCnString")));
-
+builder.Services.AddScoped<IBuyer, ProductRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
