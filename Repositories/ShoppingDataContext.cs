@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+
+
 namespace ShopEaseApp.Models
 {
     public class ShoppingDataContext
     {
-      
 
         public class ShoppingModelDB : DbContext
         {

@@ -9,6 +9,7 @@ using ShopEaseApp.Helpers;
 using Microsoft.OpenApi.Models;
 using static ShopEaseApp.Models.ShoppingDataContext;
 using ShopEaseApp.Repositories;
+using ShopEaseApp.Areas.Buyer.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,7 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ShopEaseApp", Version = "v1" });
 });
 
+builder.Services.AddScoped<BuyerModel, IBuyer>();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
