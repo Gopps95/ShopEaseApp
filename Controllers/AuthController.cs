@@ -61,6 +61,8 @@ namespace ShopEaseApp.Controllers
                     IsEssential = true // Indicates the cookie is essential for the application to function
                 };
                 //Response.Cookies.Append("UserId", "1234567", options);
+               int userid= _userrepo.getUserIdbyName(model.Username);
+                Response.Cookies.Append(model.Username, userid.ToString());
                 Response.Cookies.Append(model.Username, tokenString, options);
 
 

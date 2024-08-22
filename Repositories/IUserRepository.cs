@@ -12,6 +12,8 @@ namespace ShopEaseApp.Repositories
         Task<bool> RegisterUserAsync(User user); // Register a new user
         bool LoginAsync(string username, string password); // Login a user
         Task<bool> UpdateUserAsync(User user);
+        int getUserIdbyName(string username);
+
     }
 
     // Interface for seller operations
@@ -43,6 +45,8 @@ namespace ShopEaseApp.Repositories
         Task<bool> ConfirmPaymentAsync(int orderId, Payment payment);
         Task<Order> GetOrderDetailsAsync(int orderId);
         Task<IEnumerable<OrderDetail>> GetOrderDetailsForOrderAsync(int orderId);
+        int getUserIdbyName(string username);
+
     }
 
     //    // Implementation of the seller repository
@@ -54,6 +58,8 @@ namespace ShopEaseApp.Repositories
         {
             _context = context;
         }
+
+        
 
         public async Task<User> GetUserByIdAsync(int userId)
         {
@@ -153,6 +159,11 @@ namespace ShopEaseApp.Repositories
            }
 
          return status;
+        }
+
+        public int getUserIdbyName(string username)
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -271,6 +282,12 @@ namespace ShopEaseApp.Repositories
 
             return status;
 
+        }
+
+        public int getUserIdbyName(string username)
+        {
+         User user  = _context.User.Where(u => u.UserName == username).Single();
+            return user.UserID;
         }
     }
 

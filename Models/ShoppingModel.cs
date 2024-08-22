@@ -60,7 +60,7 @@ namespace ShopEaseApp.Models
             public int? UserID { get; set; }
 
             // Navigation property
-            public User User { get; set; }
+         //   public User User { get; set; }
             // public ICollection<OrderDetail> OrderDetails { get; set; }
         }
 
@@ -79,7 +79,7 @@ namespace ShopEaseApp.Models
             public bool OrderStatus { get; set; }
 
             // Navigation properties
-            public User User { get; set; }
+           public User User { get; set; }
         }
 
 
@@ -105,7 +105,7 @@ namespace ShopEaseApp.Models
             // Navigation properties
 
             public Order Order { get; set; }
-            public Product Product { get; set; }
+           public Product Product { get; set; }
 
 
 
