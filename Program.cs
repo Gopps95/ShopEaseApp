@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using ShopEaseApp.Areas.Buyers.Models;
+using ShopEaseApp.Models;
 using static ShopEaseApp.Models.ShoppingDataContext;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,9 +12,20 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<ShoppingModelDB>
+builder.Services.AddDbContext<ShoppingDataContext>
            (options => options.UseSqlServer(builder.Configuration.GetConnectionString("ShoppingCnString")));
-
+builder.Services.AddScoped<Buyer, Buyer1>();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromSeconds(10);
+    options.IOTimeout = TimeSpan.FromSeconds(10);
+    options.Cookie.Name = ".MySampleMVCWeb.Session";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Path = "/";
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,7 +38,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
+app.UseSession();
 app.MapControllers();
 
 app.Run();

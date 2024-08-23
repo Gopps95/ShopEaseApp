@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using static ShopEaseApp.Models.ShoppingModel;
 namespace ShopEaseApp.Models
 {
-    public class ShoppingDataContext
-    {
+
       
 
-        public class ShoppingModelDB : DbContext
+        public class ShoppingDataContext : DbContext
         {
-            public ShoppingModelDB(DbContextOptions<ShoppingModelDB> options) : base(options)
+            public ShoppingDataContext(DbContextOptions<ShoppingDataContext> options) : base(options)
             {
 
             }
@@ -29,6 +29,6 @@ namespace ShopEaseApp.Models
     //});
     //        }
 
-        }
+        
     }
 }
