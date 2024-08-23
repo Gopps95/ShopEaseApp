@@ -7,8 +7,9 @@ namespace ShopEaseApp.Areas.Seller.Models
     public interface ISellerModel
     {
         public void Create(Product model,int? id);
-        //public Product Update(Product model);
-        //public Product Delete(int ProductId);
+        public bool Update(int productId, Product model, int? userId);
+
+        public bool Delete(int productId, int? userId);
         List<Product> GetAllProducts();
         //public bool ConfirmOrder(int OrderID);
         //public bool ConfirmPayment(int ProductId);
@@ -38,10 +39,21 @@ namespace ShopEaseApp.Areas.Seller.Models
             _dbContext.SaveChanges();
         }
 
-        //public Product Delete(int ProductId)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        
+            public bool Delete(int productId, int? userId)
+            {
+                var product = _dbContext.Products.FirstOrDefault(p => p.ProductID == productId && p.UserID == userId);
+                if (product == null)
+                {
+                    return false; 
+                }
+
+                _dbContext.Products.Remove(product);
+                _dbContext.SaveChanges();
+
+                return true;
+            }
+        
 
         public List<OrderDetail> GetAllOrders()
         {
@@ -53,9 +65,25 @@ namespace ShopEaseApp.Areas.Seller.Models
               return _dbContext.Products.ToList();  
         }
 
-        //public Product Update(Product model)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        public bool Update(int productId, Product model, int? userId)
+        {
+            var existingProduct = _dbContext.Products.FirstOrDefault(p => p.ProductID == productId && p.UserID == userId);
+            if (existingProduct == null)
+            {
+                return false; 
+            }
+
+           
+            existingProduct.ProductName = model.ProductName;
+            existingProduct.ProductDescription = model.ProductDescription;
+            existingProduct.Price = model.Price;
+            existingProduct.StockQuantity = model.StockQuantity;
+            
+
+            _dbContext.Products.Update(existingProduct);
+            _dbContext.SaveChanges();
+
+            return true;
+        }
     }
 }

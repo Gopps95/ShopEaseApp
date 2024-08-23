@@ -77,15 +77,45 @@ namespace ShopEaseApp.Areas.Seller.Controllers
         }
 
         // PUT api/<SellerController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut("updateproduct/{id}")]
+        public IActionResult UpdateProduct(int id, [FromBody] Product product)
         {
+            int? userId = _httpcontext.HttpContext.Session.GetInt32("UserID");
+
+            if (userId == null)
+            {
+                return Unauthorized("User not authenticated.");
+            }
+
+            bool result = _sel.Update(id, product, userId);
+
+            if (!result)
+            {
+                return NotFound("Product not found or you are not the owner.");
+            }
+
+            return Ok("Product updated successfully.");
         }
 
         // DELETE api/<SellerController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("product/delete/{id}")]
+        public IActionResult DeleteProduct(int id)
         {
+            int? userId = _httpcontext.HttpContext.Session.GetInt32("UserID");
+
+            if (userId == null)
+            {
+                return Unauthorized("User not authenticated.");
+            }
+
+            bool result = _sel.Delete(id, userId);
+
+            if (!result)
+            {
+                return NotFound("Product not found or you are not the owner.");
+            }
+
+            return Ok("Product deleted successfully.");
         }
     }
 }
