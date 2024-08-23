@@ -14,6 +14,8 @@ using ShopEaseApp.Areas.Seller.Models;
 using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddControllers();
 
 // Add services to the container.
 builder.Services.AddDbContext<ShoppingModelDB>(options =>
@@ -30,16 +32,24 @@ builder.Services.AddScoped<BuyerModel, IBuyer>();
 
 
 //builder.Services.AddTransient<IUserRepository, SellerRepository>();
-builder.Services.AddTransient<IUserRepository, BuyerRepository>();
-builder.Services.AddTransient<ISellerModel, SellerModel>();
+builder.Services.AddScoped<IUserRepository, BuyerRepository>();
+builder.Services.AddScoped<ISellerModel, SellerModel>();
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(6); // Set session timeout
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.IOTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.Name = "SessionData";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Path = "/";
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;// Set session timeout
 });
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddControllers();
+//builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ShopEaseApp", Version = "v1" });
@@ -91,7 +101,7 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidAudience = builder.Configuration["JWT:ValidAudience"],
         ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-        ClockSkew = TimeSpan.Zero,
+        //ClockSkew = TimeSpan.Zero,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
     };
 });
@@ -110,31 +120,33 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    //app.Use(async (context, next) =>
-    //{
-    //    var JWToken = context.Session.GetString("JWTToken");
-    //    if (!string.IsNullOrEmpty(JWToken) && !context.Request.Headers.ContainsKey("Authorization"))
-    //    {
-    //        context.Request.Headers.Add("Authorization", "Bearer " + JWToken);
-    //    }
-    //    await next();
-    //});
+   
 }
-    app.UseHttpsRedirection();
 
-    app.UseSession();
+//app.Use(async (context, next) =>
+//{
+//    var JWToken = context.Session.GetString("JWTToken");
+//    if (!string.IsNullOrEmpty(JWToken) && !context.Request.Headers.ContainsKey("Authorization"))
+//    {
+//        context.Request.Headers.Add("Authorization", "Bearer " + JWToken);
+//    }
+//    await next();
+//});
+
+
+app.UseSession();
     app.Use(async (context, next) =>
     {
-        var JWToken = context.Session.GetString("JWTToken");
-        if (!string.IsNullOrEmpty(JWToken))
-        {
-            context.Request.Headers.Add("Authorization", "Bearer " + JWToken);
-        }
+        var JWToken = context.Session.GetString("UserID");
+        //if (!string.IsNullOrEmpty(JWToken))
+        //{
+        //    context.Request.Headers.Add("Authorization", "Bearer " + JWToken);
+        //}
         await next();
     });
 
-
-    app.UseAuthentication();
+app.UseHttpsRedirection();
+app.UseAuthentication();
    // app.UseRouting();
     app.UseAuthorization();
 

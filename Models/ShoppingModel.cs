@@ -56,11 +56,21 @@ namespace ShopEaseApp.Models
             public int StockQuantity { get; set; }
 
 
-            //[ForeignKey("User")]
-            public int? UserID { get; set; }
+        
+
+        //[ForeignKey("User")]
+        int? _userid;
+            public int? UserID 
+        {
+             set
+            {
+                _userid = value;
+            }
+             get { return _userid; }
+        }
 
             // Navigation property
-         //   public User User { get; set; }
+        //   public User User { get; set; }
             // public ICollection<OrderDetail> OrderDetails { get; set; }
         }
 

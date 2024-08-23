@@ -6,7 +6,7 @@ namespace ShopEaseApp.Areas.Seller.Models
 {
     public interface ISellerModel
     {
-        public void Create(Product model);
+        public void Create(Product model,int? id);
         //public Product Update(Product model);
         //public Product Delete(int ProductId);
         List<Product> GetAllProducts();
@@ -31,8 +31,9 @@ namespace ShopEaseApp.Areas.Seller.Models
         //    throw new NotImplementedException();
         //}
 
-        public void Create(Product model)
+        public void Create(Product model,int? id)
         {
+            model.UserID = id;
            _dbContext.Products.Add(model);
             _dbContext.SaveChanges();
         }

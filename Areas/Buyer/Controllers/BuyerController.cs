@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ShopEaseApp.Areas.Buyer.Models;
+using ShopEaseApp.Areas.Seller.Models;
 using ShopEaseApp.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -16,11 +17,18 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
             _b=b;
         }
         // GET: api/<BuyerController>
+        //[HttpGet]
+        //public List<CartItems> Get()
+        //{
+        //    List<CartItems> myPurchase = HttpContext.Session.GetCart().MyCartItems;
+        //    return myPurchase;
+        //}
         [HttpGet("{id}")]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
         }
+
 
         // GET api/<BuyerController>/5
         [HttpGet("name")]
@@ -31,6 +39,15 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
         }
 
         // POST api/<BuyerController>
+        //[HttpPost]
+        //public IActionResult Post([FromBody] CartItems item)
+        //{
+        //    var cart = HttpContext.Session.GetCart();
+        //    cart.MyCartItems.Add(item);
+        //    HttpContext.Session.SetObject("Cart", cart);
+        //    return Ok("Product Added to Cart");
+        //}
+
         [HttpPost("{id}")]
         public void Post([FromBody] string value)
         {

@@ -14,13 +14,15 @@ namespace ShopEaseApp.Areas.Seller.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-  //  [Authorize(Roles = "Seller")]
+  [Authorize(Roles = "Seller")]
     public class SellerController : ControllerBase
     {
         ISellerModel _sel;
-        public SellerController(ISellerModel sel)
+        IHttpContextAccessor _httpcontext;
+        public SellerController(ISellerModel sel,IHttpContextAccessor httpcontext)
         {
             _sel = sel;
+            _httpcontext = httpcontext;
         }
 
         // GET: api/<SellerController>
@@ -55,13 +57,22 @@ namespace ShopEaseApp.Areas.Seller.Controllers
        // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public void PostProduct([FromBody]Product product)
         {
-          if( Request.Cookies.TryGetValue("UserId", out string userId))
-           {
-                int userid = Convert.ToInt32(userId);
-                HttpContext.Session.SetInt32("userid", userid);
+            // if( Request.Cookies.TryGetValue("UserId", out string userId))
+            // {
+            //int userid = Convert.ToInt32(userId);
+            int? UserID=_httpcontext.HttpContext.Session.GetInt32("UserID");
+            //Product p1 = new Product();
+            //p1.ProductName = product.ProductName;
+            //p1.ProductDescription = product.ProductDescription; 
+            //p1.Price=product.Price;
+            //p1.StockQuantity = product.StockQuantity;
+            
+            
+
+          //  product.UserID=HttpContext.Session.GetInt32("UserID");
                 
-                _sel.Create(product);
-            }
+                _sel.Create(product,UserID);
+            //}
             
         }
 

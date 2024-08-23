@@ -17,11 +17,12 @@ namespace ShopEaseApp.Controllers
     {
        // private readonly IAuthService _authService;
         private readonly IUserRepository _userrepo;
-
-        public AuthController(IUserRepository userrepo)
+        IHttpContextAccessor _httpcontext;
+        public AuthController(IUserRepository userrepo,IHttpContextAccessor httpContext)
         {
             //_authService = authService;
             _userrepo = userrepo;
+            _httpcontext = httpContext; 
         }
 
         [AllowAnonymous]
@@ -62,11 +63,12 @@ namespace ShopEaseApp.Controllers
                 };
                 //Response.Cookies.Append("UserId", "1234567", options);
                int userid= _userrepo.getUserIdbyName(model.Username);
+                        
                 Response.Cookies.Append(model.Username, userid.ToString());
-                Response.Cookies.Append(model.Username, tokenString, options);
+                Response.Cookies.Append("JWTToken", tokenString, options);
 
-
-              HttpContext.Session.SetString("JWTToken", model.Username);
+                _httpcontext.HttpContext.Session.SetInt32("UserID", userid);
+              //  HttpContext.Session.SetInt32("UserID", userid);
 
                   return Ok(new JWTTokenResponse { Token = tokenString });
                 
