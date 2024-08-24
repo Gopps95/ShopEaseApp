@@ -85,7 +85,7 @@ namespace ShopEaseApp.Models
            public int? UserID { get; set; }
 
             [DataType(DataType.Currency)]
-            public decimal TotalAmount { get; private set; }
+            public decimal TotalAmount { get;  set; }
             public bool OrderStatus { get; set; }
             public int Quantity { get; set; }
 
