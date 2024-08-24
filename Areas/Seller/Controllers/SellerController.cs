@@ -33,11 +33,11 @@ namespace ShopEaseApp.Areas.Seller.Controllers
         }
 
 
-        [HttpGet("Orders")]
-        public IEnumerable<Order> GetAllOrders()
-        {
-            return (IEnumerable<Order>)_sel.GetAllOrders();
-        }
+        //[HttpGet("Orders")]
+        //public IEnumerable<Order> GetAllOrders()
+        //{
+        //    return (IEnumerable<Order>)_sel.GetAllOrders();
+        //}
         // GET api/<SellerController>/5
         [HttpGet("{id}")]
         public bool Confirmorder(int OrderID)

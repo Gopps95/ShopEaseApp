@@ -31,7 +31,7 @@ namespace ShopEaseApp.Repositories
         Task<IEnumerable<Product>> GetAllProductsAsync();
         Task<bool> ConfirmOrderAsync(int orderId);
         Task<Order> GetOrderDetailsAsync(int orderId);
-        Task<IEnumerable<OrderDetail>> GetOrderDetailsForOrderAsync(int orderId);
+      //  Task<IEnumerable<OrderDetail>> GetOrderDetailsForOrderAsync(int orderId);
         Task<bool> ConfirmPaymentAsync(int paymentId);
     }
 
@@ -40,11 +40,11 @@ namespace ShopEaseApp.Repositories
     {
         Task<IEnumerable<Product>> SearchProductsAsync(string searchTerm);
         Task<Product> GetProductByIdAsync(int productId);
-        Task<bool> AddToCartAsync(int userId, int productId, int quantity);
+       // Task<bool> AddToCartAsync(int userId, int productId, int quantity);
         Task<bool> ConfirmOrderAsync(int userId);
         Task<bool> ConfirmPaymentAsync(int orderId, Payment payment);
         Task<Order> GetOrderDetailsAsync(int orderId);
-        Task<IEnumerable<OrderDetail>> GetOrderDetailsForOrderAsync(int orderId);
+       // Task<IEnumerable<OrderDetail>> GetOrderDetailsForOrderAsync(int orderId);
         int getUserIdbyName(string username);
 
     }
@@ -120,13 +120,13 @@ namespace ShopEaseApp.Repositories
                 .FirstOrDefaultAsync(o => o.OrderID == orderId);
         }
 
-        public async Task<IEnumerable<OrderDetail>> GetOrderDetailsForOrderAsync(int orderId)
-        {
-            return await _context.OrderDetails
-                .Include(od => od.Product)
-                .Where(od => od.Order.OrderID == orderId)
-                .ToListAsync();
-        }
+        //public async Task<IEnumerable<OrderDetail>> GetOrderDetailsForOrderAsync(int orderId)
+        //{
+        //    return await _context.OrderDetails
+        //        .Include(od => od.Product)
+        //        .Where(od => od.Order.OrderID == orderId)
+        //        .ToListAsync();
+        //}
 
         public async Task<bool> ConfirmPaymentAsync(int paymentId)
         {
@@ -205,25 +205,25 @@ namespace ShopEaseApp.Repositories
             return await _context.Products.FindAsync(productId);
         }
 
-        public async Task<bool> AddToCartAsync(int userId, int productId, int quantity)
-        {
-            var order = await _context.Orders.FirstOrDefaultAsync(o => o.User.UserID == userId && !o.OrderStatus);
-            if (order == null)
-            {
-                order = new Order { User = await _context.User.FindAsync(userId) };
-                await _context.Orders.AddAsync(order);
-            }
+        //public async Task<bool> AddToCartAsync(int userId, int productId, int quantity)
+        //{
+        //    var order = await _context.Orders.FirstOrDefaultAsync(o => o.User.UserID == userId && !o.OrderStatus);
+        //    if (order == null)
+        //    {
+        //        order = new Order { User = await _context.User.FindAsync(userId) };
+        //        await _context.Orders.AddAsync(order);
+        //    }
 
-            var orderDetail = new OrderDetail
-            {
-                Order = order,
-                Product = await _context.Products.FindAsync(productId),
-                Quantity = quantity
-            };
+        //    var orderDetail = new OrderDetail
+        //    {
+        //        Order = order,
+        //        Product = await _context.Products.FindAsync(productId),
+        //        Quantity = quantity
+        //    };
 
-            await _context.OrderDetails.AddAsync(orderDetail);
-            return await _context.SaveChangesAsync() > 0;
-        }
+        //    await _context.OrderDetails.AddAsync(orderDetail);
+        //    return await _context.SaveChangesAsync() > 0;
+        //}
 
         public async Task<bool> ConfirmOrderAsync(int userId)
         {
@@ -250,13 +250,13 @@ namespace ShopEaseApp.Repositories
                 .FirstOrDefaultAsync(o => o.OrderID == orderId);
         }
 
-        public async Task<IEnumerable<OrderDetail>> GetOrderDetailsForOrderAsync(int orderId)
-        {
-            return await _context.OrderDetails
-                .Include(od => od.Product)
-                .Where(od => od.Order.OrderID == orderId)
-                .ToListAsync();
-        }
+        //public async Task<IEnumerable<OrderDetail>> GetOrderDetailsForOrderAsync(int orderId)
+        //{
+        //    return await _context.OrderDetails
+        //        .Include(od => od.Product)
+        //        .Where(od => od.Order.OrderID == orderId)
+        //        .ToListAsync();
+        //}
         public async Task<bool> RegisterUserAsync(User userregistration)
         {
             await _context.User.AddAsync(userregistration);

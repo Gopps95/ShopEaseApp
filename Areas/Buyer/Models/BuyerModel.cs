@@ -5,6 +5,9 @@ namespace ShopEaseApp.Areas.Buyer.Models
     public interface BuyerModel
     {
         public Product Search(string name);
+        //public void AddToCart(int productId, int quantity, int? userId);
+        //public void RemoveFromCart(int productId, int? userId);
+
     }
     public class IBuyer : BuyerModel
     {
@@ -13,6 +16,17 @@ namespace ShopEaseApp.Areas.Buyer.Models
         {
             _datacontext = datacontext;
         }
+
+        //public void AddToCart(int productId, int quantity, int? userId)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //public void RemoveFromCart(int productId, int? userId)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
         public Product Search(string name)
         {
             Product model = new Product();

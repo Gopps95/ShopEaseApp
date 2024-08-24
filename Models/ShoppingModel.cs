@@ -82,11 +82,13 @@ namespace ShopEaseApp.Models
 
             //[Required]
             //[ForeignKey("User")]
-            public int? UserID { get; set; }
+           public int? UserID { get; set; }
 
             [DataType(DataType.Currency)]
             public decimal TotalAmount { get; private set; }
             public bool OrderStatus { get; set; }
+            public int Quantity { get; set; }
+
 
             // Navigation properties
            public User User { get; set; }
@@ -111,10 +113,10 @@ namespace ShopEaseApp.Models
             public int Quantity { get; set; }
 
             public int UnitPrice { get; set; }
-
+            public int? UserID { get; set; }
             // Navigation properties
 
-            public Order Order { get; set; }
+            //public Order Order { get; set; }
            public Product Product { get; set; }
 
 

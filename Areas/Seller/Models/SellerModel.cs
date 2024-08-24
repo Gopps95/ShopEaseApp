@@ -13,7 +13,7 @@ namespace ShopEaseApp.Areas.Seller.Models
         List<Product> GetAllProducts();
         //public bool ConfirmOrder(int OrderID);
         //public bool ConfirmPayment(int ProductId);
-        List<OrderDetail> GetAllOrders();
+        //List<OrderDetail> GetAllOrders();
     }
     public class SellerModel : ISellerModel
     {
@@ -55,10 +55,10 @@ namespace ShopEaseApp.Areas.Seller.Models
             }
         
 
-        public List<OrderDetail> GetAllOrders()
-        {
-            return _dbContext.OrderDetails.OrderBy(x => x.Order).ToList();
-        }
+        //public List<OrderDetail> GetAllOrders()
+        //{
+        //    return _dbContext.OrderDetails.OrderBy(x => x.Order).ToList();
+        //}
 
         public List<Product> GetAllProducts()
         {
