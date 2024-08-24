@@ -20,7 +20,26 @@ namespace ShopEaseApp.Models
             public DbSet<OrderDetail> OrderDetails { get; set; }
             public DbSet<Payment> Payments { get; set; }
 
-          //  public DbSet<RegistrationModel> Register { get; set; }
+
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                modelBuilder.Entity<OrderDetail>()
+            .HasKey(od => new { od.OrderID, od.ProductID });
+
+                modelBuilder.Entity<Order>()
+          .HasMany(o => o.OrderDetails)
+          .WithOne(od => od.Order)
+          .HasForeignKey(od => od.OrderID);
+
+
+                modelBuilder.Entity<OrderDetail>()
+           .Property(od => od.UnitPrice)
+           .HasColumnType("decimal(18, 2)");
+                // base.OnModelCreating(modelBuilder);
+            }
+
+
+            //  public DbSet<RegistrationModel> Register { get; set; }
             //        protected override void OnModelCreating(ModelBuilder modelBuilder)
             //        {
             //            modelBuilder

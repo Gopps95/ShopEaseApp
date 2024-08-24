@@ -89,14 +89,14 @@ namespace ShopEaseApp.Models
             public bool OrderStatus { get; set; }
             public int Quantity { get; set; }
 
-
-            // Navigation properties
-           public User User { get; set; }
+        public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+        // Navigation properties
+        public User User { get; set; }
         }
 
 
         [Table("OrderDetails")]
-        [Keyless]
+        //[Keyless]
         public class OrderDetail
         {
             // [NotMapped()]
@@ -112,16 +112,16 @@ namespace ShopEaseApp.Models
             [Required]
             public int Quantity { get; set; }
 
-            public int UnitPrice { get; set; }
+            public decimal UnitPrice { get; set; }
             public int? UserID { get; set; }
             // Navigation properties
 
             //public Order Order { get; set; }
            public Product Product { get; set; }
+        public Order Order { get; set; }
 
 
-
-        }
+    }
 
         [Table("Payments")]
         public class Payment

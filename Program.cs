@@ -19,7 +19,8 @@ builder.Services.AddControllers();
 
 // Add services to the container.
 builder.Services.AddDbContext<ShoppingModelDB>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ShoppingCnString")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ShoppingCnString")).UseQueryTrackingBehavior
+    (QueryTrackingBehavior.NoTracking));
 
 builder.Services.AddScoped<BuyerModel, IBuyer>();
 //builder.Services.AddScoped<ISellerModel, SellerModel>();

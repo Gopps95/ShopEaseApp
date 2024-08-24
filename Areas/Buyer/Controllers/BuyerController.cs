@@ -28,7 +28,9 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
         //    List<CartItems> myPurchase = HttpContext.Session.GetCart().MyCartItems;
         //    return myPurchase;
         //}
-        [HttpGet("abc")]
+
+
+        [HttpGet("DisplayCart")]
         public List<CartItems> Get()
         {
             var cartItems = _httpContextAccessor.HttpContext.Session.GetCart().MyCartItems;
@@ -111,5 +113,61 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
 
             return Ok("Product removed from cart");
         }
+        [HttpPost("ConfirmOrder")]
+        public IActionResult ConfirmOrder()
+        {
+            
+            // Get the user ID from the session
+            int? userId = _httpContextAccessor.HttpContext.Session.GetInt32("UserID");
+            if (userId == null)
+            {
+                return Unauthorized("User not logged in");
+            }
+            var cart = _httpContextAccessor.HttpContext.Session.GetCart();
+          
+            var newOrder = new Order
+            {
+                UserID = userId.Value,
+              //  OrderDate = DateTime.Now
+            };
+            _dbContext.Orders.Add(newOrder);
+            _dbContext.SaveChanges();
+          
+            foreach (var cartItem in cart.MyCartItems)
+            {
+                var product = _dbContext.Products.FirstOrDefault(p => p.ProductID == cartItem.ProductID);
+                if (product == null)
+                {
+                    return NotFound($"Product with ID {cartItem.ProductID} not found");
+                }
+                if (product.StockQuantity < cartItem.Qty)
+                {
+                    return BadRequest($"Insufficient stock for {product.ProductName}. Available: {product.StockQuantity}, Requested: {cartItem.Qty}");
+                }
+                
+                product.StockQuantity -= cartItem.Qty;
+                //---------------------//
+                var orderDetail = new OrderDetail();
+                // orderDetail = new OrderDetail
+                //{
+                orderDetail.OrderID = newOrder.OrderID;
+                orderDetail.ProductID = cartItem.ProductID;
+                orderDetail.UserID = userId.Value;
+                orderDetail.Quantity = cartItem.Qty;
+                orderDetail.UnitPrice = cartItem.Price;
+                // };
+                _dbContext.OrderDetails.Add(orderDetail);
+                _dbContext.SaveChanges();
+            }
+
+            
+
+
+
+            cart.MyCartItems.Clear();
+            _httpContextAccessor.HttpContext.Session.SetObject("Cart", cart);
+            return Ok("Order confirmed successfully");
+        }
+
     }
 }

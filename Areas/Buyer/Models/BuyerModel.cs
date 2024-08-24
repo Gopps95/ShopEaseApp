@@ -7,6 +7,7 @@ namespace ShopEaseApp.Areas.Buyer.Models
         public Product Search(string name);
         //public void AddToCart(int productId, int quantity, int? userId);
         //public void RemoveFromCart(int productId, int? userId);
+       // string ConfirmOrder(int userId);
 
     }
     public class IBuyer : BuyerModel
@@ -16,6 +17,8 @@ namespace ShopEaseApp.Areas.Buyer.Models
         {
             _datacontext = datacontext;
         }
+
+       
 
         //public void AddToCart(int productId, int quantity, int? userId)
         //{

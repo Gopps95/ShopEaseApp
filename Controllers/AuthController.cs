@@ -67,6 +67,8 @@ namespace ShopEaseApp.Controllers
                 Response.Cookies.Append(model.Username, userid.ToString());
                 Response.Cookies.Append("JWTToken", tokenString, options);
 
+
+
                 _httpcontext.HttpContext.Session.SetInt32("UserID", userid);
               //  HttpContext.Session.SetInt32("UserID", userid);
 
