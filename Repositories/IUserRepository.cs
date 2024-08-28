@@ -13,7 +13,7 @@ namespace ShopEaseApp.Repositories
         bool LoginAsync(string username, string password); // Login a user
         Task<bool> UpdateUserAsync(User user);
         int getUserIdbyName(string username);
-
+        
     }
 
     // Interface for seller operations
@@ -53,10 +53,12 @@ namespace ShopEaseApp.Repositories
     public class SellerRepository : ISellerRepository
     {
         private readonly ShoppingDataContext.ShoppingModelDB _context;
+        
 
         public SellerRepository(ShoppingDataContext.ShoppingModelDB context)
         {
             _context = context;
+            
         }
 
         
@@ -140,6 +142,7 @@ namespace ShopEaseApp.Repositories
         }
         public async Task<bool> RegisterUserAsync(User user)
         {
+            
             await _context.User.AddAsync(user);
             return await _context.SaveChangesAsync() > 0;
         }
@@ -259,7 +262,12 @@ namespace ShopEaseApp.Repositories
         //}
         public async Task<bool> RegisterUserAsync(User userregistration)
         {
-            await _context.User.AddAsync(userregistration);
+            User n = new User();
+            n.Password= BCrypt.Net.BCrypt.HashPassword(userregistration.Password);  
+            n.UserName= userregistration.UserName;
+            n.EmailID= userregistration.EmailID;    
+            n.Role=userregistration.Role;   
+            await _context.User.AddAsync(n);
             return await _context.SaveChangesAsync() > 0;
         }
 
@@ -270,12 +278,11 @@ namespace ShopEaseApp.Repositories
 
             bool status = false;
             User user = _context.User.Where(x => x.UserName == username).FirstOrDefault();
-            if (user != null)
+            if (user != null && BCrypt.Net.BCrypt.Verify(password,user.Password))
             {
-                if (user.Password == password)
-                {
+               
                     status = true;
-                }
+                
 
 
             }

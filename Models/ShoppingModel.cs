@@ -20,7 +20,7 @@ namespace ShopEaseApp.Models
             public string EmailID { get; set; }
 
             [Required]
-            [StringLength(50)]
+            
             [MinLength(10)]
             [DataType(DataType.Password)]
             public string Password { get; set; }
