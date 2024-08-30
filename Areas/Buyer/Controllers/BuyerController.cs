@@ -153,7 +153,11 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
                     return BadRequest($"Insufficient stock for {product.ProductName}. Available: {product.StockQuantity}, Requested: {cartItem.Qty}");
                 }
 
-                product.StockQuantity -= cartItem.Qty; // Update stock quantity
+                // Update stock quantity
+                product.StockQuantity -= cartItem.Qty;
+
+                // Mark the product as modified
+                _dbContext.Products.Update(product);
 
                 var orderDetail = new OrderDetail
                 {
@@ -165,8 +169,10 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
                 };
 
                 _dbContext.OrderDetails.Add(orderDetail);
-                _dbContext.SaveChanges();
             }
+
+            // Save all changes to the database
+            _dbContext.SaveChanges();
 
             // Clear the cart after payment confirmation
             cart.MyCartItems.Clear();
@@ -179,6 +185,7 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
 
             return Ok("Payment confirmed and order placed successfully");
         }
+
 
         [HttpGet("OrderDetails")]
         public IActionResult GetOrderDetails()
