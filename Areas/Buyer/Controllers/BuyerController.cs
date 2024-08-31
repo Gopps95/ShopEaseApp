@@ -139,6 +139,10 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
                 return BadRequest("Cart is empty");
             }
 
+            // Create a list to store bill lines
+            List<string> billLines = new List<string>();
+            decimal totalPrice = 0;
+
             // Add order details and update stock
             foreach (var cartItem in cart.MyCartItems)
             {
@@ -155,8 +159,6 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
 
                 // Update stock quantity
                 product.StockQuantity -= cartItem.Qty;
-
-                // Mark the product as modified
                 _dbContext.Products.Update(product);
 
                 var orderDetail = new OrderDetail
@@ -169,6 +171,13 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
                 };
 
                 _dbContext.OrderDetails.Add(orderDetail);
+
+                // Calculate and add to total price
+                decimal itemTotal = cartItem.Qty * cartItem.Price;
+                totalPrice += itemTotal;
+
+                // Add line to the bill
+                billLines.Add($"Product: {product.ProductName}, Quantity: {cartItem.Qty}, Unit Price: {cartItem.Price:C}, Total: {itemTotal:C}");
             }
 
             // Save all changes to the database
@@ -183,8 +192,57 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
             _dbContext.Orders.Update(existingOrder);
             _dbContext.SaveChanges();
 
-            return Ok("Payment confirmed and order placed successfully");
+            // Add total price and thank you message to the bill
+            billLines.Add($"\nTotal Price: {totalPrice:C}");
+            billLines.Add("\nThank you for shopping with us! We hope to see you again!");
+
+            // Generate a bill as a text file
+            string billFileName = $"Bill_Order_{existingOrder.OrderID}.txt";
+            string billContent = string.Join(Environment.NewLine, billLines);
+            byte[] billBytes = System.Text.Encoding.UTF8.GetBytes(billContent);
+
+            // Return the text file as a download
+            return File(billBytes, "text/plain", billFileName);
         }
+
+        [HttpGet("TopTrendingItems")]
+        public IActionResult TopTrendingItems()
+        {
+            // Group the OrderDetails by ProductID and calculate the purchase count for each product
+            var topTrendingItems = _dbContext.OrderDetails
+                .GroupBy(od => od.ProductID)
+                .Select(g => new
+                {
+                    ProductID = g.Key,
+                    PurchaseCount = g.Count()
+                })
+                .OrderByDescending(x => x.PurchaseCount)
+                .Take(5)  // Get the top 5 products
+                .ToList();
+
+            if (!topTrendingItems.Any())
+            {
+                return NotFound("No trending items found.");
+            }
+
+            // Fetch the product details for the top 5 products using the ProductIDs
+            var topProducts = topTrendingItems
+                .Select(item => new
+                {
+                    Product = _dbContext.Products.FirstOrDefault(p => p.ProductID == item.ProductID),
+                    item.PurchaseCount
+                })
+                .Where(x => x.Product != null)  // Ensure products are not null
+                .Select(x => new
+                {
+                    x.Product.ProductName,
+                    x.PurchaseCount
+                })
+                .ToList();
+
+            return Ok(topProducts);
+        }
+
 
 
         [HttpGet("OrderDetails")]
