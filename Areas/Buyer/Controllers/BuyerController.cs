@@ -40,11 +40,11 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
 
         // GET api/<BuyerController>/5
         [HttpGet("name")]
-        public Product Get(string name)
+        public List<Product> Get(string name)
         {
-            
             return _b.Search(name);
         }
+
 
         // POST api/<BuyerController>
         //[HttpPost("buyer/product/AddtoCart")]

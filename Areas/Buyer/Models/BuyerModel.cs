@@ -1,47 +1,31 @@
 ﻿using ShopEaseApp.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ShopEaseApp.Areas.Buyer.Models
 {
     public interface BuyerModel
     {
-        public Product Search(string name);
-        //public void AddToCart(int productId, int quantity, int? userId);
-        //public void RemoveFromCart(int productId, int? userId);
-       // string ConfirmOrder(int userId);
-
+        public List<Product> Search(string name);  // Updated to return a list of products
     }
+
     public class IBuyer : BuyerModel
     {
-        ShoppingDataContext.ShoppingModelDB _datacontext;
+        private readonly ShoppingDataContext.ShoppingModelDB _datacontext;
+
         public IBuyer(ShoppingDataContext.ShoppingModelDB datacontext)
         {
             _datacontext = datacontext;
         }
 
-       
-
-        //public void AddToCart(int productId, int quantity, int? userId)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public void RemoveFromCart(int productId, int? userId)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        public Product Search(string name)
+        // Updated Search method to use EF.Functions.Like
+        public List<Product> Search(string name)
         {
-            Product model = new Product();
-            foreach (var item in _datacontext.Products)
-            {
-                if (item.ProductName == name)
-                {
-                    model = item;
-                }
-            }
-            return model;
-            // throw new NotImplementedException();
+            // Use EF.Functions.Like for partial matching
+            var matchedProducts = _datacontext.Products
+                .Where(p => EF.Functions.Like(p.ProductName, $"%{name}%")) // Use wildcards for partial matches
+                .ToList();
+
+            return matchedProducts;  // Return the list of matched products
         }
     }
 }
