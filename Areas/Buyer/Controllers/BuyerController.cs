@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ShopEaseApp.Areas.Buyer.Models;
 //using ShopEaseApp.Areas.Seller.Models;
 using ShopEaseApp.Models;
@@ -10,6 +11,7 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Buyer")]
     public class BuyerController : ControllerBase
     {
         BuyerModel _b;
@@ -139,6 +141,9 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
                 return BadRequest("Cart is empty");
             }
 
+            // Calculate discount
+            decimal discountPercentage = _b.CalculateDiscount(userId.Value);
+
             // Create a list to store bill lines
             List<string> billLines = new List<string>();
             decimal totalPrice = 0;
@@ -172,13 +177,17 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
 
                 _dbContext.OrderDetails.Add(orderDetail);
 
-                // Calculate and add to total price
+                // Calculate and add to total price before discount
                 decimal itemTotal = cartItem.Qty * cartItem.Price;
                 totalPrice += itemTotal;
 
                 // Add line to the bill
                 billLines.Add($"Product: {product.ProductName}, Quantity: {cartItem.Qty}, Unit Price: {cartItem.Price:C}, Total: {itemTotal:C}");
             }
+
+            // Apply discount to total price
+            decimal discountedPrice = totalPrice * (1 - discountPercentage);
+            existingOrder.TotalAmount = discountedPrice;
 
             // Save all changes to the database
             _dbContext.SaveChanges();
@@ -192,9 +201,11 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
             _dbContext.Orders.Update(existingOrder);
             _dbContext.SaveChanges();
 
-            // Add total price and thank you message to the bill
-            billLines.Add($"\nTotal Price: {totalPrice:C}");
-            billLines.Add("\nThank you for shopping with us! We hope to see you again!");
+            // Add total price and discount details to the bill
+            billLines.Add($"\nTotal Price (before discount): {totalPrice:C}");
+            billLines.Add($"Discount Applied: {discountPercentage:P0}");
+            billLines.Add($"Total Price (after discount): {discountedPrice:C}");
+            billLines.Add("\nThank you for shopping with us! Enjoy your discount on future orders if eligible.");
 
             // Generate a bill as a text file
             string billFileName = $"Bill_Order_{existingOrder.OrderID}.txt";
@@ -204,7 +215,6 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
             // Return the text file as a download
             return File(billBytes, "text/plain", billFileName);
         }
-
         [HttpGet("TopTrendingItems")]
         public IActionResult TopTrendingItems()
         {
