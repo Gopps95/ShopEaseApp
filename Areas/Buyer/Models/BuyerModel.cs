@@ -34,23 +34,23 @@ namespace ShopEaseApp.Areas.Buyer.Models
 
         {
 
-            // Fetch all completed orders for the user
+           
 
             int completedOrderCount = _datacontext.Orders.Count(o => o.UserID == userId && o.OrderStatus);
 
-            // Determine the cycle position
+           
 
-            int cycle = completedOrderCount / 5; // Every 5 orders starts a new discount cycle
+            int cycle = completedOrderCount / 5; 
 
-            int orderInCycle = completedOrderCount % 5; // Determine order position within the cycle
+            int orderInCycle = completedOrderCount % 5; 
 
-            // Discount logic: After every 5 completed orders, next 3 orders get a discount
+           
 
             if (orderInCycle >= 0 && orderInCycle < 3)
 
             {
 
-                return 0.10m; // 10% discount for orders in positions 0, 1, and 2 within the cycle
+                return 0.10m; 
 
             }
 
