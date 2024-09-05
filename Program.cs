@@ -17,22 +17,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddControllers();
 
-// Add services to the container.
+
 builder.Services.AddDbContext<ShoppingModelDB>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ShoppingCnString")).UseQueryTrackingBehavior
     (QueryTrackingBehavior.NoTracking));
 
 builder.Services.AddScoped<BuyerModel, IBuyer>();
-//builder.Services.AddScoped<ISellerModel, SellerModel>();
-
-//builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-//    .AddEntityFrameworkStores<ShoppingModelDB>()
-//    .AddDefaultTokenProviders();
-
-//builder.Services.AddTransient<IAuthService, AuthService>();
 
 
-//builder.Services.AddTransient<IUserRepository, SellerRepository>();
+
 builder.Services.AddScoped<IUserRepository, BuyerRepository>();
 builder.Services.AddScoped<ISellerModel, SellerModel>();
 
@@ -47,15 +40,14 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
     options.Cookie.Path = "/";
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;// Set session timeout
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
-//builder.Services.AddControllers();
-//builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ShopEaseApp", Version = "v1" });
 
-    // Add JWT Authentication to Swagger
+    
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\"",
@@ -102,7 +94,7 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidAudience = builder.Configuration["JWT:ValidAudience"],
         ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-        //ClockSkew = TimeSpan.Zero,
+        
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
     };
 });

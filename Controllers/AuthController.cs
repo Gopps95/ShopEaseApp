@@ -44,34 +44,34 @@ namespace ShopEaseApp.Controllers
                         new Claim(ClaimTypes.Name,model.Username),
                         new Claim(ClaimTypes.Role,model.Role)
                     }),
-                    expires: DateTime.Now.AddMinutes(6),
+                    expires: DateTime.Now.AddMinutes(60),
                     signingCredentials: signinCredentials
                 );
 
                 var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
 
-                ///create a cookie to store the token
+                
                 CookieOptions options = new CookieOptions
                 {
-                    Domain = "localhost", // Set the domain for the cookie
-                    Expires = DateTime.Now.AddMinutes(6), // Set expiration date to 7 days from now
-                    Path = "/", // Cookie is available within the entire application
-                    Secure = true, // Ensure the cookie is only sent over HTTPS
-                    HttpOnly = true, // Prevent client-side scripts from accessing the cookie
-                  //  MaxAge = TimeSpan.FromMinutes(6), // Another way to set the expiration time
-                    IsEssential = true // Indicates the cookie is essential for the application to function
+                    Domain = "localhost", 
+                    Expires = DateTime.Now.AddMinutes(60), 
+                    Path = "/", 
+                    Secure = true, 
+                    HttpOnly = true, 
+                  
+                    IsEssential = true 
                 };
-                //Response.Cookies.Append("UserId", "1234567", options);
-               int userid= _userrepo.getUserIdbyName(model.Username);
-                        
-                Response.Cookies.Append(model.Username, userid.ToString());
+                
+               int userid= _userrepo.GetUserIdByName(model.Username);
+                string encodedUsername = Uri.EscapeDataString(model.Username);
+                Response.Cookies.Append(encodedUsername, userid.ToString());
+              
                 Response.Cookies.Append("JWTToken", tokenString, options);
 
 
 
                 _httpcontext.HttpContext.Session.SetInt32("UserID", userid);
-              //  HttpContext.Session.SetInt32("UserID", userid);
-
+             
                   return Ok(new JWTTokenResponse { Token = tokenString });
                 
 

@@ -1,4 +1,4 @@
-﻿namespace ShopEaseApp.Controllers
+﻿namespace ShopEaseApp.Models
 {
     internal class JWTTokenResponse
     {

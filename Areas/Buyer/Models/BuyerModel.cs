@@ -10,7 +10,7 @@ namespace ShopEaseApp.Areas.Buyer.Models
 
     {
 
-        public List<Product> Search(string name);  // Updated to return a list of products
+        public List<Product> Search(string name);  
 
         decimal CalculateDiscount(int userId);
 
@@ -34,19 +34,17 @@ namespace ShopEaseApp.Areas.Buyer.Models
 
         {
 
-           
+            
 
-            int completedOrderCount = _datacontext.Orders.Count(o => o.UserID == userId && o.OrderStatus);
+            decimal totalAmountSpent = _datacontext.Orders
 
-           
+                .Where(o => o.UserID == userId && o.OrderStatus)
 
-            int cycle = completedOrderCount / 5; 
+                .Sum(o => o.TotalAmount);
 
-            int orderInCycle = completedOrderCount % 5; 
+            
 
-           
-
-            if (orderInCycle >= 0 && orderInCycle < 3)
+            if (totalAmountSpent > 50000)
 
             {
 
@@ -54,32 +52,48 @@ namespace ShopEaseApp.Areas.Buyer.Models
 
             }
 
+            else if (totalAmountSpent > 10000)
+
+            {
+
+                return 0.07m; 
+
+            }
+
+            else if (totalAmountSpent > 3000)
+
+            {
+
+                return 0.05m; 
+
+            }
+
             else
 
             {
 
-                return 0m; // No discount for other orders
+                return 0.0m; 
 
             }
 
         }
 
-        // Updated Search method to use EF.Functions.Like
+
+
 
         public List<Product> Search(string name)
 
         {
 
-            // Use EF.Functions.Like for partial matching
+           
 
             var matchedProducts = _datacontext.Products
 
-                .Where(p => EF.Functions.Like(p.ProductName, $"%{name}%")) // Use wildcards for partial matches
+                .Where(p => EF.Functions.Like(p.ProductName, $"%{name}%")) 
 
                 .ToList();
 
-            return matchedProducts;  // Return the list of matched products
-
+            return matchedProducts;  
         }
 
     }

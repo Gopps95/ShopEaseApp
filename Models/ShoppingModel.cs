@@ -12,7 +12,7 @@ namespace ShopEaseApp.Models
 
             [Required]
             [StringLength(50)]
-            [MinLength(10)]
+            
             public string UserName { get; set; }
 
             [Required]
@@ -28,7 +28,7 @@ namespace ShopEaseApp.Models
             [Required]
             public string Role { get; set; }
 
-            // Navigation property for orders
+            
         }
 
 
@@ -40,12 +40,12 @@ namespace ShopEaseApp.Models
 
             [Required]
             [StringLength(50)]
-            [MinLength(10)]
+
             public string ProductName { get; set; }
 
             [Required]
             [StringLength(50)]
-            [MinLength(10)]
+           
             public string ProductDescription { get; set; }
 
             [Required]
@@ -58,7 +58,7 @@ namespace ShopEaseApp.Models
 
         
 
-        //[ForeignKey("User")]
+        
         int? _userid;
             public int? UserID 
         {
@@ -69,9 +69,6 @@ namespace ShopEaseApp.Models
              get { return _userid; }
         }
 
-            // Navigation property
-        //   public User User { get; set; }
-            // public ICollection<OrderDetail> OrderDetails { get; set; }
         }
 
         [Table("Orders")]
@@ -80,8 +77,6 @@ namespace ShopEaseApp.Models
             [Key]
             public int OrderID { get; set; }
 
-            //[Required]
-            //[ForeignKey("User")]
            public int? UserID { get; set; }
 
             [DataType(DataType.Currency)]
@@ -90,23 +85,19 @@ namespace ShopEaseApp.Models
             public int Quantity { get; set; }
 
         public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
-        // Navigation properties
+        
         public User User { get; set; }
         }
 
 
         [Table("OrderDetails")]
-        //[Keyless]
+        
         public class OrderDetail
         {
-            // [NotMapped()]
-            // [Key()]
-            //public int OrderDetailsID { get; set; }
-
-            //[ForeignKey("Orders")]
+            
             public int? OrderID { get; set; }
 
-            //[ForeignKey("Products")]
+            
             public int? ProductID { get; set; }
 
             [Required]
@@ -114,46 +105,15 @@ namespace ShopEaseApp.Models
 
             public decimal UnitPrice { get; set; }
             public int? UserID { get; set; }
-            // Navigation properties
+            
 
-            //public Order Order { get; set; }
            public Product Product { get; set; }
         public Order Order { get; set; }
 
 
     }
 
-        [Table("Payments")]
-        public class Payment
-        {
-            [Key]
-            [Required]
-            public int PaymentID { get; set; }
-
-            //[ForeignKey("Orders")]
-            public int? OrderID { get; set; }
-
-            public int Amount { get; private set; }
-
-            public bool PaymentStatus { get; set; }
-
-            public string PaymentMethod { get; set; }
-
-            public Order Order { get; set; }
-        }
-
-        [Table("Category")]
-        public class Category
-        {
-            [Key]
-            public int CategoryID { get; set; }
-
-            [Required]
-            public string CategoryName { get; set; }
-
-            [Required]
-            public string CategoryDescription { get; set; }
-        }
+       
     
    
 }

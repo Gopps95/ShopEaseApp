@@ -2,10 +2,9 @@
 
 using System.Collections.Generic;
 
-using System.Linq;  // For LINQ queries
+using System.Linq;  
 
-using Microsoft.AspNetCore.Http;  // For accessing session
-
+using Microsoft.AspNetCore.Http;  
 using static ShopEaseApp.Models.ShoppingDataContext;
 
 namespace ShopEaseApp.Areas.Seller.Models
@@ -24,10 +23,9 @@ namespace ShopEaseApp.Areas.Seller.Models
 
         List<Product> GetAllProducts();
 
-        List<Product> GetProductsBoughtFromSeller(int? userId);  // Method to get products bought from the seller
+        List<Product> GetProductsBoughtFromSeller(int? userId);  
 
-        (int SellerId, string SellerName) GetSellerInfo(int? userId, IHttpContextAccessor httpContextAccessor);  // Method to get seller information
-
+        (int SellerId, string SellerName) GetSellerInfo(int? userId, IHttpContextAccessor httpContextAccessor);  
     }
 
     public class SellerModel : ISellerModel
@@ -36,7 +34,7 @@ namespace ShopEaseApp.Areas.Seller.Models
 
         private readonly ShoppingModelDB _dbContext;
 
-        private readonly IHttpContextAccessor _httpContextAccessor;  // Accessing the HttpContext
+        private readonly IHttpContextAccessor _httpContextAccessor;  
 
         public SellerModel(ShoppingModelDB context, IHttpContextAccessor httpContextAccessor)
 
@@ -138,7 +136,7 @@ namespace ShopEaseApp.Areas.Seller.Models
 
         }
 
-        // Updated method to get seller information and fetch username from session
+        
 
         public (int SellerId, string SellerName) GetSellerInfo(int? userId, IHttpContextAccessor httpContextAccessor)
 
@@ -146,7 +144,7 @@ namespace ShopEaseApp.Areas.Seller.Models
 
             if (userId == null) return (0, string.Empty);
 
-            // Retrieve Username from session
+           
 
             string username = httpContextAccessor.HttpContext.Session.GetString("Username");
 
@@ -154,7 +152,7 @@ namespace ShopEaseApp.Areas.Seller.Models
 
                 .Where(u => u.UserID == userId)
 
-                .Select(u => new { SellerId = u.UserID, SellerName = username })  // Fetching Username from session
+                .Select(u => new { SellerId = u.UserID, SellerName = u.UserName})  
 
                 .FirstOrDefault();
 

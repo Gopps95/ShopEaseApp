@@ -12,14 +12,13 @@ namespace ShopEaseApp.Models
             {
 
             }
-            public DbSet<Category> Categories { get; set; }
+         
             public DbSet<User> User { get; set; }
 
             public DbSet<Product> Products { get; set; }
             public DbSet<Order> Orders { get; set; }
             public DbSet<OrderDetail> OrderDetails { get; set; }
-            public DbSet<Payment> Payments { get; set; }
-
+         
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {

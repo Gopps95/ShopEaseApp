@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShopEaseApp.Areas.Buyer.Models;
-//using ShopEaseApp.Areas.Seller.Models;
 using ShopEaseApp.Models;
 using static ShopEaseApp.Models.ShoppingDataContext;
-//using ShopEaseApp.Areas.Buyer.Models;
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace ShopEaseApp.Areas.Buyer.Controllers
 {
@@ -23,14 +20,7 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
             _httpContextAccessor = httpContextAccessor;
             _dbContext = dbContext;
         }
-        // GET: api/<BuyerController>
-        //[HttpGet]
-        //public List<CartItems> Get()
-        //{
-        //    List<CartItems> myPurchase = HttpContext.Session.GetCart().MyCartItems;
-        //    return myPurchase;
-        //}
-
+        
 
         [HttpGet("DisplayCart")]
         public List<CartItems> Get()
@@ -40,65 +30,120 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
         }
 
 
-        // GET api/<BuyerController>/5
-        [HttpGet("name")]
+        
+        [HttpGet("Search")]
         public List<Product> Get(string name)
         {
             return _b.Search(name);
         }
+        [HttpPut("UpdateUserDetails")]
+
+        public IActionResult UpdateUserDetails([FromBody] User updatedUserDetails)
+
+        {
+
+           
+
+            int? userId = _httpContextAccessor.HttpContext.Session.GetInt32("UserID");
+
+            if (userId == null)
+
+            {
+
+                return Unauthorized("User not logged in");
+
+            }
+
+            
+
+            var existingUser = _dbContext.User.FirstOrDefault(u => u.UserID == userId);
+
+            if (existingUser == null)
+
+            {
+
+                return NotFound("User not found");
+
+            }
+
+            
+
+            if (!string.IsNullOrEmpty(updatedUserDetails.UserName))
+
+                existingUser.UserName = updatedUserDetails.UserName;
+
+            if (!string.IsNullOrEmpty(updatedUserDetails.EmailID))
+
+                existingUser.EmailID = updatedUserDetails.EmailID;
+
+            
+
+            if (!string.IsNullOrEmpty(updatedUserDetails.Password))
+
+            {
+
+                
+
+                string salt = BCrypt.Net.BCrypt.GenerateSalt();
+
+                existingUser.Password = BCrypt.Net.BCrypt.HashPassword(updatedUserDetails.Password, salt);
+
+            }
+
+            
+
+            _dbContext.User.Update(existingUser);
+
+            _dbContext.SaveChanges();
+
+            return Ok("User details updated successfully");
+
+        }
 
 
-        // POST api/<BuyerController>
-        //[HttpPost("buyer/product/AddtoCart")]
-        //public IActionResult Post([FromBody] Buyer.Models.CartItems item)
-        //{
-        //    var cart = HttpContext.Session.GetCart();
-        //    cart.MyCartItems.Add(item);
-        //    HttpContext.Session.SetObject("Cart", cart);
-        //    return Ok("Product Added to Cart");
-        //}
+        
 
         [HttpPost("AddToCart")]
         public IActionResult AddToCart( int productId, int quantity)
         {
-            // Fetch product from the database using productId
+            
             var product = _dbContext.Products.FirstOrDefault(p => p.ProductID == productId);
             if (product == null)
             {
                 return NotFound("Product not found");
             }
 
-            // Get the user ID from the session
+        
             int? userId = _httpContextAccessor.HttpContext.Session.GetInt32("UserID");
             if (userId == null)
             {
                 return Unauthorized("User not logged in");
             }
 
-            // Check if an order already exists for the user with OrderStatus false
+       
             var existingOrder = _dbContext.Orders.FirstOrDefault(o => o.UserID == userId && !o.OrderStatus);
             if (existingOrder == null)
             {
-                // Create a new order with status false
+                
                 existingOrder = new Order
                 {
                     UserID = userId.Value,
-                    OrderStatus = false, // Initially false, to be updated on payment confirmation
-                    TotalAmount = 0 // Initial total amount is 0
+                    OrderStatus = false, 
+                    TotalAmount = 0 
                 };
 
                 _dbContext.Orders.Add(existingOrder);
                 _dbContext.SaveChanges();
             }
 
-            // Create a new CartItem and add it to the order (calculate total amount)
+           
             existingOrder.TotalAmount += product.Price * quantity;
 
-            // Update the order's total amount
+            
             _dbContext.Orders.Update(existingOrder);
             _dbContext.SaveChanges();
 
-            // Store the cart item in the session for temporary storage
+            
             var cartItem = new CartItems
             {
                 UserId = userId.Value,
@@ -118,37 +163,37 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
         [HttpPost("ConfirmPayment")]
         public IActionResult ConfirmPayment()
         {
-            // Get the user ID from the session
+           
             int? userId = _httpContextAccessor.HttpContext.Session.GetInt32("UserID");
             if (userId == null)
             {
                 return Unauthorized("User not logged in");
             }
 
-            // Retrieve the existing order with status false
+           
             var existingOrder = _dbContext.Orders.FirstOrDefault(o => o.UserID == userId && !o.OrderStatus);
             if (existingOrder == null)
             {
                 return BadRequest("No pending order found to confirm payment");
             }
 
-            // Get the cart from the session
+           
             var cart = _httpContextAccessor.HttpContext.Session.GetCart();
 
-            // Check if cart is empty
+           
             if (cart.MyCartItems.Count == 0)
             {
                 return BadRequest("Cart is empty");
             }
 
-            // Calculate discount
+          
             decimal discountPercentage = _b.CalculateDiscount(userId.Value);
 
-            // Create a list to store bill lines
+            
             List<string> billLines = new List<string>();
             decimal totalPrice = 0;
 
-            // Add order details and update stock
+           
             foreach (var cartItem in cart.MyCartItems)
             {
                 var product = _dbContext.Products.FirstOrDefault(p => p.ProductID == cartItem.ProductID);
@@ -162,7 +207,7 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
                     return BadRequest($"Insufficient stock for {product.ProductName}. Available: {product.StockQuantity}, Requested: {cartItem.Qty}");
                 }
 
-                // Update stock quantity
+               
                 product.StockQuantity -= cartItem.Qty;
                 _dbContext.Products.Update(product);
 
@@ -177,48 +222,48 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
 
                 _dbContext.OrderDetails.Add(orderDetail);
 
-                // Calculate and add to total price before discount
+                
                 decimal itemTotal = cartItem.Qty * cartItem.Price;
                 totalPrice += itemTotal;
 
-                // Add line to the bill
+               
                 billLines.Add($"Product: {product.ProductName}, Quantity: {cartItem.Qty}, Unit Price: {cartItem.Price:C}, Total: {itemTotal:C}");
             }
 
-            // Apply discount to total price
+           
             decimal discountedPrice = totalPrice * (1 - discountPercentage);
             existingOrder.TotalAmount = discountedPrice;
 
-            // Save all changes to the database
+            
             _dbContext.SaveChanges();
 
-            // Clear the cart after payment confirmation
+            
             cart.MyCartItems.Clear();
             _httpContextAccessor.HttpContext.Session.SetObject("Cart", cart);
 
-            // Update the order status to true
+            
             existingOrder.OrderStatus = true;
             _dbContext.Orders.Update(existingOrder);
             _dbContext.SaveChanges();
 
-            // Add total price and discount details to the bill
+            
             billLines.Add($"\nTotal Price (before discount): {totalPrice:C}");
             billLines.Add($"Discount Applied: {discountPercentage:P0}");
             billLines.Add($"Total Price (after discount): {discountedPrice:C}");
             billLines.Add("\nThank you for shopping with us! Enjoy your discount on future orders if eligible.");
 
-            // Generate a bill as a text file
+            
             string billFileName = $"Bill_Order_{existingOrder.OrderID}.txt";
             string billContent = string.Join(Environment.NewLine, billLines);
             byte[] billBytes = System.Text.Encoding.UTF8.GetBytes(billContent);
 
-            // Return the text file as a download
+            
             return File(billBytes, "text/plain", billFileName);
         }
         [HttpGet("TopTrendingItems")]
         public IActionResult TopTrendingItems()
         {
-            // Group the OrderDetails by ProductID and calculate the purchase count for each product
+           
             var topTrendingItems = _dbContext.OrderDetails
                 .GroupBy(od => od.ProductID)
                 .Select(g => new
@@ -227,7 +272,7 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
                     PurchaseCount = g.Count()
                 })
                 .OrderByDescending(x => x.PurchaseCount)
-                .Take(5)  // Get the top 5 products
+                .Take(5)  
                 .ToList();
 
             if (!topTrendingItems.Any())
@@ -235,14 +280,14 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
                 return NotFound("No trending items found.");
             }
 
-            // Fetch the product details for the top 5 products using the ProductIDs
+          
             var topProducts = topTrendingItems
                 .Select(item => new
                 {
                     Product = _dbContext.Products.FirstOrDefault(p => p.ProductID == item.ProductID),
                     item.PurchaseCount
                 })
-                .Where(x => x.Product != null)  // Ensure products are not null
+                .Where(x => x.Product != null)  
                 .Select(x => new
                 {
                     x.Product.ProductName,
@@ -258,14 +303,14 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
         [HttpGet("OrderDetails")]
         public IActionResult GetOrderDetails()
         {
-            // Get the user ID from the session
+           
             int? userId = _httpContextAccessor.HttpContext.Session.GetInt32("UserID");
             if (userId == null)
             {
                 return Unauthorized("User not logged in");
             }
 
-            // Fetch all confirmed orders for the user
+           
             var orders = _dbContext.Orders
                 .Where(o => o.UserID == userId && o.OrderStatus)
                 .Select(o => new
@@ -284,11 +329,6 @@ namespace ShopEaseApp.Areas.Buyer.Controllers
 
 
 
-        // PUT api/<BuyerController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
 
         [HttpDelete("remove/{productId}")]
         public IActionResult RemoveFromCart(int productId)

@@ -73,25 +73,25 @@ namespace ShopEaseApp.Areas.Seller.Controllers
 
         // GET api/<SellerController>/5
 
-        [HttpGet("{id}")]
+        //[HttpGet("{id}")]
 
-        public bool Confirmorder(int OrderID)
+        //public bool Confirmorder(int OrderID)
 
-        {
+        //{
 
-            return true;
+        //    return true;
 
-        }
+        //}
 
-        [HttpGet("{id}/products")]
+        //[HttpGet("{id}/products")]
 
-        public bool ConfirmPayment(int products)
+        //public bool ConfirmPayment(int products)
 
-        {
+        //{
 
-            return true;
+        //    return true;
 
-        }
+        //}
 
         // POST api/<SellerController>
 
@@ -194,7 +194,7 @@ namespace ShopEaseApp.Areas.Seller.Controllers
 
         }
 
-        // Download a report of products bought from the seller
+       
 
         [HttpGet("DownloadProductReport")]
 
@@ -202,8 +202,7 @@ namespace ShopEaseApp.Areas.Seller.Controllers
 
         {
 
-            // Fetch user ID from session
-
+            
             int? userId = _httpcontext.HttpContext.Session.GetInt32("UserID");
 
             if (userId == null)
@@ -214,7 +213,7 @@ namespace ShopEaseApp.Areas.Seller.Controllers
 
             }
 
-            // Get seller information
+            
 
             var sellerInfo = _sel.GetSellerInfo(userId, _httpcontext);
 
@@ -226,7 +225,7 @@ namespace ShopEaseApp.Areas.Seller.Controllers
 
             }
 
-            // Get the list of products bought from the seller
+           
 
             var productsBought = _sel.GetProductsBoughtFromSeller(userId);
 
@@ -238,8 +237,7 @@ namespace ShopEaseApp.Areas.Seller.Controllers
 
             }
 
-            // Generate the text file content
-
+            
             StringBuilder reportContent = new StringBuilder();
 
             reportContent.AppendLine($"Seller ID: {sellerInfo.SellerId}");
@@ -260,13 +258,13 @@ namespace ShopEaseApp.Areas.Seller.Controllers
 
             }
 
-            // Convert the content to a byte array for file download
+            
 
             byte[] fileBytes = Encoding.UTF8.GetBytes(reportContent.ToString());
 
             var fileName = $"Seller_{sellerInfo.SellerName}_ProductReport.txt";
 
-            // Return the file as a download
+            
 
             return File(fileBytes, "text/plain", fileName);
 
